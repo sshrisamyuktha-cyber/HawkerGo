@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HawkerGo</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<nav>
+<div class="nav-container">
+<h1>🍜 HawkerGo</h1>
+</div>
+</nav>
+
+<section class="hero">
+<h1>Find Shorter Queues. Eat Faster.</h1>
+<p class="subtitle">Live wait times across your hawker centre.</p>
+
+</section>
+<section class="map-section">
+
+<h1>Live Hawker Map</h1>
+
+<div class="map-wrapper">
+
+<!-- MAP -->
+<div class="map">
+
+<img src="map.png" class="map-bg">
+
+<!-- INDIAN -->
+<a href="menu-curry.html" class="stall indian short" style="top:49%; left:69%;">
+<span class="wait-badge">5</span>
+
+<div class="popup">
+<h3>Curry Express</h3>
+<p class="cuisine">Indian • Non-Halal</p>
+<p class="rating">⭐ 4.7</p>
+<div class="wait-btn short">5 mins</div>
+</div>
+</a>
+
+<!-- CHINESE -->
+<a href="menu-noodle.html" class="stall chinese long" style="top:49%; left:33%;">
+<span class="wait-badge">20</span>
+
+<div class="popup">
+<h3>Noodle Master</h3>
+<p class="cuisine">Chinese • Non-Halal</p>
+<p class="rating">⭐ 4.8</p>
+<div class="wait-btn long">20 mins</div>
+</div>
+</a>
+
+<!-- WESTERN -->
+<a href="menu-grill.html" class="stall western medium" style="top:72%; left:60%;">
+<span class="wait-badge">12</span>
+
+<div class="popup">
+<h3>Grill House</h3>
+<p class="cuisine">Western • Non-Halal</p>
+<p class="rating">⭐ 4.6</p>
+<div class="wait-btn medium">12 mins</div>
+</div>
+</a>
+
+<!-- Thai -->
+<a href="menu-thai.html" class="stall thai short" style="top:49%; left:69%;">
+<span class="wait-badge">5</span>
+
+<div class="popup">
+<h3>Thai Delight</h3>
+<p class="cuisine">Thai • Non-Halal</p>
+<p class="rating">⭐ 4.7</p>
+<div class="wait-btn short">5 mins</div>
+</div>
+</a>
+
+<!-- Peranakan -->
+<a href="menu-peranakan.html" class="stall peranakan short" style="top:72%; left:33%;">
+<span class="wait-badge">5</span>
+
+<div class="popup">
+<h3>Peranakan Delight</h3>
+<p class="cuisine">Peranakan • Non-Halal</p>
+<p class="rating">⭐ 4.7</p>
+<div class="wait-btn short">5 mins</div>
+</div>
+</a>
+<!-- HALAL -->
+<a href="menu-halal.html" class="stall halal short" style="top:49%; left:50%;">
+<span class="wait-badge">6</span>
+
+<div class="popup">
+<h3>Halal Delight</h3>
+<p class="cuisine">Halal • Chicken</p>
+<p class="rating">⭐ 4.9</p>
+<div class="wait-btn short">6 mins</div>
+</div>
+</a>
+
+<!-- DESSERT -->
+<a href="menu-dessert.html" class="stall dessert medium" style="top:72%; left:81%;">
+<span class="wait-badge">10</span>
+
+<div class="popup">
+<h3>Sweet Treats</h3>
+<p class="cuisine">Dessert • Non-Halal</p>
+<p class="rating">⭐ 4.8</p>
+<div class="wait-btn medium">10 mins</div>
+</div>
+</a>
+
+</div>
+
+
+<!-- LEGEND -->
+<div class="side-legend">
+
+<h3>Legend</h3>
+
+<div class="legend-section">
+<h4>Cuisine</h4>
+<div class="legend-item"><span class="legend-color indian"></span> Indian</div>
+<div class="legend-item"><span class="legend-color chinese"></span> Chinese</div>
+<div class="legend-item"><span class="legend-color western"></span> Western</div>
+<div class="legend-item"><span class="legend-color thai"></span> Thai</div>
+<div class="legend-item"><span class="legend-color peranakan"></span> Peranakan</div>
+<div class="legend-item"><span class="legend-color halal"></span> Halal</div>
+<div class="legend-item"><span class="legend-color dessert"></span> Dessert</div>
+</div>
+
+<div class="legend-section">
+<h4>Wait Time</h4>
+<div class="legend-item"><span class="legend-color short"></span> Short</div>
+<div class="legend-item"><span class="legend-color medium"></span> Medium</div>
+<div class="legend-item"><span class="legend-color long"></span> Long</div>
+</div>
+
+</div>
+</section>
+
+<section class="wait-times">
+
+<h1>🔥 Current Wait Times</h1>
+
+<div class="cards">
+
+<a href="menu-curry.html" class="card indian">
+<h3>Curry Express</h3>
+<div class="donut short">5m</div>
+<p>Indian</p>
+</a>
+
+<a href="menu-noodle.html" class="card chinese">
+<h3>Noodle Master</h3>
+<div class="donut long">20m</div>
+<p>Chinese</p>
+</a>
+
+<a href="menu-grill.html" class="card western">
+<h3>Grill House</h3>
+<div class="donut medium">12m</div>
+<p>Western</p>
+</a>
+
+<a href="menu-thai.html" class="card thai">
+<h3>Thai Delight</h3>
+<div class="donut short">5m</div>
+<p>Thai</p>
+</a>
+
+<a href="menu-peranakan.html" class="card peranakan">
+<h3>Peranakan Delight</h3>
+<div class="donut short">5m</div>
+<p>Peranakan</p>
+</a>
+
+<a href="menu-halal.html" class="card halal">
+<h3>Halal Delight</h3>
+<div class="donut short">6m</div>
+<p>Halal</p>
+</a>
+
+<a href="menu-dessert.html" class="card dessert">
+<h3>Sweet Treats</h3>
+<div class="donut medium">10m</div>
+<p>Dessert</p>
+</a>
+
+</div>
+</section>
+<section class="bottom-quiz">
+    <h2>Not sure what to get now?/Still can't decide?</h2>
+    <p>Use our Decision Quiz to find the best stall for you.</p>
+
+    <a href="decision.html" class="bottom-quiz-btn">
+        🍽️ Click Here to Take the Decision Quiz
+    </a>
+</section>
+
+</body>
+</html>

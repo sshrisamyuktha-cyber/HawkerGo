@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noodle Master Menu</title>
+<link rel="stylesheet" href="menu.css">
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header class="menu-header">
+    <h1>🍜 Noodle Master</h1>
+    <p>Chinese • Non-Halal • ⭐ 4.8</p>
+</header>
+
+<div style="margin: 20px 0;">
+  <a href="index.html" class="return-button">← Return to Main Page</a>
+</div>
+
+<div class="menu-container">
+
+    <!-- CATEGORY SIDEBAR -->
+    <aside class="categories">
+        <button class="active" onclick="showCategory('noodles', event)">Noodles</button>
+        <button onclick="showCategory('rice', event)">Rice</button>
+        <button onclick="showCategory('sides', event)">Sides</button>
+        <button onclick="showCategory('drinks', event)">Drinks</button>
+    </aside>
+
+    <!-- FOOD DISPLAY -->
+    <section class="food-grid">
+
+        <!-- NOODLES -->
+        <div class="category noodles">
+
+            <!-- Beef Laksa -->
+            <div class="food-card">
+                <img src="beef.png" alt="Beef Laksa" width="100%">
+                <h3>Beef Laksa</h3>
+                <p>⭐ 4.4</p>
+                <p>#01-27</p>
+                <p>Wait: 20 mins</p>
+                <p>$5.50</p>
+            </div>
+
+
+            <!-- Mee Goreng -->
+            <div class="food-card">
+                <img src="me.png" alt="Mee Goreng" width="100%">
+                <h3>Mee Goreng</h3>
+                <p>⭐ 4.9</p>
+                <p>#01-27</p>
+                <p>Wait: 10 mins</p>
+                <p>$6.00</p>
+            </div>
+
+
+        </div> <!-- ✅ CLOSE NOODLES -->
+
+        <!-- RICE -->
+        <div class="category rice hidden">
+            <div class="food-card">
+                <h3>Yang Zhou Fried Rice</h3>
+                <p>$6.50</p>
+            </div>
+
+            <div class="food-card">
+                <h3>Chicken Rice</h3>
+                <p>$5.80</p>
+            </div>
+        </div>
+
+        <!-- SIDES -->
+        <div class="category sides hidden">
+            <div class="food-card">
+                <h3>Steamed Dumplings</h3>
+                <p>$4.50</p>
+            </div>
+
+            <div class="food-card">
+                <h3>Spring Rolls</h3>
+                <p>$3.50</p>
+            </div>
+        </div>
+
+        <!-- DRINKS -->
+        <div class="category drinks hidden">
+            <div class="food-card">
+                <h3>Chinese Tea</h3>
+                <p>$1.50</p>
+            </div>
+
+            <div class="food-card">
+                <h3>Iced Lemon Tea</h3>
+                <p>$2.00</p>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+
+<script>
+function showCategory(type, event) {
+
+    // Hide all categories
+    document.querySelectorAll('.category').forEach(cat => {
+        cat.classList.add('hidden');
+    });
+
+    // Show selected
+    document.querySelector('.' + type).classList.remove('hidden');
+
+    // Update active button
+    document.querySelectorAll('.categories button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>

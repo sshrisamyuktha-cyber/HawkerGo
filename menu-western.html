@@ -3,59 +3,48 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Grill House Menu</title>
+<title>Confirm+Chop Western Grill</title>
 <link rel="stylesheet" href="menu.css" />
-<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 </head>
 <body>
 <header class="menu-header">
-  <h1>🍔 Grill House</h1>
-  <p>Western • Non-Halal • ⭐ 4.8</p>
+  <h1>🍔 Confirm+Chop Western Grill</h1>
+  <p>Western • Non-Halal • ⭐ 4.6</p>
 </header>
+
 <div style="margin: 20px 0;">
   <a href="index.html" class="return-button">← Return to Main Page</a>
 </div>
 
 <div class="menu-container">
   <aside class="categories">
-    <button class="active" onclick="showCategory('burgers')">Burgers</button>
-    <button onclick="showCategory('sides')">Sides</button>
-    <button onclick="showCategory('drinks')">Drinks</button>
+    <button class="active" onclick="showCategory('mains')">Mains</button>
+    <button onclick="showCategory('burgers')">Burgers</button>
+    <button onclick="showCategory('buddy')">Buddy Sets</button>
   </aside>
 
   <section class="food-grid">
-    <div class="category burgers">
-      <div class="food-card">
-        <h3>Classic Cheeseburger</h3>
-        <p>$8.00</p>
-      </div>
-      <div class="food-card">
-        <h3>Bacon Double Stack</h3>
-        <p>$9.50</p>
-      </div>
+
+    <div class="category mains">
+      <div class="food-card"><h3>Fish and Chips Set</h3><p>$11.20</p></div>
+      <div class="food-card"><h3>Fried Chicken Cutlet with Fries</h3><p>$11.20</p></div>
+      <div class="food-card"><h3>Grilled Dory Fish with Fries</h3><p>$11.20</p></div>
+      <div class="food-card"><h3>Grilled Sausages with Fried Rice</h3><p>$11.20</p></div>
+      <div class="food-card"><h3>Battered Fried Fish with Pasta</h3><p>$11.20</p></div>
+      <div class="food-card"><h3>Grilled Chicken Chop with Pasta</h3><p>$11.20</p></div>
     </div>
 
-    <div class="category sides hidden">
-      <div class="food-card">
-        <h3>French Fries</h3>
-        <p>$3.00</p>
-      </div>
-      <div class="food-card">
-        <h3>Onion Rings</h3>
-        <p>$3.50</p>
-      </div>
+    <div class="category burgers hidden">
+      <div class="food-card"><h3>Angus Beef Burger</h3><p>$10.80</p></div>
+      <div class="food-card"><h3>Chicken Burger</h3><p>$8.90</p></div>
     </div>
 
-    <div class="category drinks hidden">
-      <div class="food-card">
-        <h3>Cola</h3>
-        <p>$2.00</p>
-      </div>
-      <div class="food-card">
-        <h3>Milkshake</h3>
-        <p>$4.00</p>
-      </div>
+    <div class="category buddy hidden">
+      <div class="food-card"><h3>Buddy Set 1</h3><p>$26.80</p></div>
+      <div class="food-card"><h3>Buddy Set 2</h3><p>$26.80</p></div>
     </div>
+
   </section>
 </div>
 
@@ -63,7 +52,6 @@
 function showCategory(type) {
   document.querySelectorAll('.category').forEach(cat => cat.classList.add('hidden'));
   document.querySelector('.' + type).classList.remove('hidden');
-
   document.querySelectorAll('.categories button').forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
 }

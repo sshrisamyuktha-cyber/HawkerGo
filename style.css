@@ -117,6 +117,48 @@ h1{
   margin-top: 40px;
   font-size: 36px;
 }
+/* ================= MOBILE RESPONSIVE FIX ================= */
+
+@media (max-width: 900px) {
+
+  .map-wrapper {
+    flex-direction: column;   /* stack vertically */
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;          /* allow wrapping */
+    padding: 0 15px;
+  }
+
+  .map {
+    flex: unset;
+    width: 100%;
+    max-width: 95%;
+  }
+
+  .side-legend {
+    flex: unset;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .map-title {
+    font-size: 28px;
+    margin-top: 25px;
+  }
+
+  /* Make stalls slightly smaller on mobile */
+  .stall {
+    width: 30px;
+    height: 34px;
+  }
+
+  .wait-badge {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+
+}
 
 /* DIAGONAL STALL */
 
@@ -408,4 +450,5 @@ transition:0.3s;
 .bottom-quiz-btn:hover{
 transform:translateY(-5px);
 box-shadow:0 15px 35px rgba(234,122,42,0.4);
+
 }

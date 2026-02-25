@@ -3,59 +3,47 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Grill House Menu</title>
+<title>Kim Dae Bak Korean Cuisine</title>
 <link rel="stylesheet" href="menu.css" />
-<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 </head>
 <body>
 <header class="menu-header">
-  <h1>🍔 Grill House</h1>
-  <p>Western • Non-Halal • ⭐ 4.8</p>
+  <h1>🇰🇷 Kim Dae Bak Korean Cuisine</h1>
+  <p>Korean • Non-Halal • ⭐ 4.6</p>
 </header>
+
 <div style="margin: 20px 0;">
   <a href="index.html" class="return-button">← Return to Main Page</a>
 </div>
 
 <div class="menu-container">
   <aside class="categories">
-    <button class="active" onclick="showCategory('burgers')">Burgers</button>
-    <button onclick="showCategory('sides')">Sides</button>
-    <button onclick="showCategory('drinks')">Drinks</button>
+    <button class="active" onclick="showCategory('sets')">Set Meals</button>
+    <button onclick="showCategory('bibimbap')">Bibimbap</button>
+    <button onclick="showCategory('combos')">Combos</button>
   </aside>
 
   <section class="food-grid">
-    <div class="category burgers">
-      <div class="food-card">
-        <h3>Classic Cheeseburger</h3>
-        <p>$8.00</p>
-      </div>
-      <div class="food-card">
-        <h3>Bacon Double Stack</h3>
-        <p>$9.50</p>
-      </div>
+
+    <div class="category sets">
+      <div class="food-card"><h3>Saba Fish Set</h3><p>$10.00</p></div>
+      <div class="food-card"><h3>Bulgogi Chicken Set</h3><p>$10.00</p></div>
+      <div class="food-card"><h3>Bulgogi Beef Set</h3><p>$11.40</p></div>
+      <div class="food-card"><h3>Sambal Saba Fish Set</h3><p>$11.00</p></div>
     </div>
 
-    <div class="category sides hidden">
-      <div class="food-card">
-        <h3>French Fries</h3>
-        <p>$3.00</p>
-      </div>
-      <div class="food-card">
-        <h3>Onion Rings</h3>
-        <p>$3.50</p>
-      </div>
+    <div class="category bibimbap hidden">
+      <div class="food-card"><h3>Chicken Dol Sot Bibimbap</h3><p>$11.00</p></div>
+      <div class="food-card"><h3>Beef Dol Sot Bibimbap</h3><p>$12.40</p></div>
+      <div class="food-card"><h3>Salmon Dol Sot Bibimbap</h3><p>$12.40</p></div>
     </div>
 
-    <div class="category drinks hidden">
-      <div class="food-card">
-        <h3>Cola</h3>
-        <p>$2.00</p>
-      </div>
-      <div class="food-card">
-        <h3>Milkshake</h3>
-        <p>$4.00</p>
-      </div>
+    <div class="category combos hidden">
+      <div class="food-card"><h3>Beef Bulgogi + Chicken Sundubu Jjigae</h3><p>$16.40</p></div>
+      <div class="food-card"><h3>Chicken Bulgogi + Chicken Sundubu Jjigae</h3><p>$15.40</p></div>
     </div>
+
   </section>
 </div>
 
@@ -63,7 +51,6 @@
 function showCategory(type) {
   document.querySelectorAll('.category').forEach(cat => cat.classList.add('hidden'));
   document.querySelector('.' + type).classList.remove('hidden');
-
   document.querySelectorAll('.categories button').forEach(btn => btn.classList.remove('active'));
   event.target.classList.add('active');
 }

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Hawker Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#0f2a47;          /* Dark blue header */
+  --bg:#e8f0f8;               /* Lighter version of header */
+  --card:#ffffff;
+  --shadow:rgba(15,42,71,0.25);
+  --radius:30px;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  display:flex;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+.container{
+  width:100%;
+  max-width:850px;
+}
+
+/* HEADER */
+.header-box{
+  background:var(--primary);
+  color:white;
+  border-radius:var(--radius);
+  padding:30px;
+  text-align:center;
+  margin-bottom:30px;
+  box-shadow:0 20px 40px rgba(15,42,71,0.35);
+}
+
+.title{
+  font-family:'Lobster',cursive;
+  font-size:52px;
+  margin-bottom:10px;
+}
+
+.subtitle{
+  font-size:18px;
+  opacity:0.9;
+}
+
+/* CARD */
+.quiz-card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:30px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.05);
+}
+
+.question{
+  font-size:22px;
+  font-weight:600;
+  margin-bottom:10px;
+  color:var(--primary);
+}
+
+.hint{
+  font-size:14px;
+  opacity:0.65;
+  margin-bottom:18px;
+}
+
+.options{
+  display:grid;
+  gap:16px;
+}
+
+/* OPTION BUTTON */
+.option-btn{
+  background:#ffffff;
+  border:none;
+  border-radius:50px;
+  padding:16px 20px;
+  font-size:18px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.2s ease;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  /* BLUE SHADOW */
+  box-shadow:0 10px 25px var(--shadow);
+}
+
+.option-btn:hover{
+  transform:translateY(-2px);
+}
+
+.option-btn.selected{
+  background:#f1f6fb;
+  outline:2px solid var(--primary);
+}
+
+.tick{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  border:2px solid var(--primary);
+  display:grid;
+  place-items:center;
+  font-size:14px;
+  color:var(--primary);
+}
+
+/* BUTTONS */
+.actions{
+  display:flex;
+  justify-content:space-between;
+  margin-top:25px;
+}
+
+.btn{
+  padding:14px 22px;
+  border-radius:40px;
+  border:none;
+  font-weight:700;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.2s ease;
+}
+
+.next-btn{
+  background:var(--primary);
+  color:white;
+  box-shadow:0 8px 20px var(--shadow);
+}
+
+.back-btn{
+  background:#dce6f2;
+  color:var(--primary);
+}
+
+.btn:hover{
+  transform:scale(1.05);
+}
+
+.btn:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="header-box">
+    <div class="title">Hawker Quiz</div>
+    <div class="subtitle">Let us help you decide what to eat 🍽️</div>
+  </div>
+
+  <div class="quiz-card">
+    <div class="question" id="questionText"></div>
+    <div class="hint" id="hintText"></div>
+    <div class="options" id="optionsContainer"></div>
+
+    <div class="actions">
+      <button class="btn back-btn" id="backBtn" onclick="prevQuestion()">Back</button>
+      <button class="btn next-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+{
+  id:"diet",
+  text:"Dietary preference?",
+  hint:"You can select multiple.",
+  type:"multi",
+  options:[
+    {label:"☪️ Halal",value:"halal"},
+    {label:"🥗 Vegetarian",value:"vegetarian"},
+    {label:"🚫🐖 No Pork",value:"no_pork"},
+    {label:"🚫🐄 No Beef",value:"no_beef"},
+    {label:"✨ No Restrictions",value:"none"}
+  ]
+},
+{
+  id:"allergens",
+  text:"Any allergens?",
+  hint:"Select multiple if needed.",
+  type:"multi",
+  options:[
+    {label:"🌾 Gluten",value:"gluten"},
+    {label:"🥛 Dairy",value:"dairy"},
+    {label:"🦐 Seafood",value:"seafood"},
+    {label:"🥜 Nuts",value:"nuts"},
+    {label:"✨ None",value:"none"}
+  ]
+},
+{
+  id:"meal_type",
+  text:"What would you like to eat?",
+  hint:"Choose one.",
+  type:"single",
+  options:[
+    {label:"🍚 Rice",value:"rice"},
+    {label:"🍜 Noodles",value:"noodles"},
+    {label:"🍟 Sides / Snacks",value:"sides"},
+    {label:"✨ No Preference",value:"any"}
+  ]
+},
+{
+  id:"price",
+  text:"Budget range?",
+  hint:"Choose one.",
+  type:"single",
+  options:[
+    {label:"💸 $4–6",value:"4-6"},
+    {label:"💳 $5–7",value:"5-7"},
+    {label:"💰 $6–10",value:"6-10"},
+    {label:"✨ Any",value:"any"}
+  ]
+}
+];
+
+let currentStep=0;
+const answers={};
+
+function renderQuestion(){
+  const q=questions[currentStep];
+  document.getElementById("questionText").innerText=q.text;
+  document.getElementById("hintText").innerText=q.hint;
+
+  const container=document.getElementById("optionsContainer");
+  container.innerHTML="";
+
+  if(!answers[q.id]){
+    answers[q.id]=q.type==="multi"?[]:"";
+  }
+
+  q.options.forEach(opt=>{
+    const btn=document.createElement("button");
+    btn.className="option-btn";
+    btn.innerHTML=`<span>${opt.label}</span><div class="tick">✓</div>`;
+    btn.onclick=()=>selectOption(q,opt.value);
+
+    if(q.type==="multi"&&answers[q.id].includes(opt.value)) btn.classList.add("selected");
+    if(q.type==="single"&&answers[q.id]===opt.value) btn.classList.add("selected");
+
+    container.appendChild(btn);
+  });
+
+  document.getElementById("backBtn").disabled=currentStep===0;
+  document.getElementById("nextBtn").disabled=!isAnswered(q);
+}
+
+function selectOption(q,value){
+  if(q.type==="single"){
+    answers[q.id]=value;
+  }else{
+    const arr=answers[q.id];
+    const i=arr.indexOf(value);
+    i>-1?arr.splice(i,1):arr.push(value);
+  }
+  renderQuestion();
+}
+
+function isAnswered(q){
+  return q.type==="multi"?answers[q.id].length>0:answers[q.id]!=="";
+}
+
+function nextQuestion(){
+  if(currentStep<questions.length-1){
+    currentStep++;
+    renderQuestion();
+  }else{
+    localStorage.setItem("hawkergo_answers",JSON.stringify(answers));
+    window.location.href="recommendation.html";
+  }
+}
+
+function prevQuestion(){
+  if(currentStep>0){
+    currentStep--;
+    renderQuestion();
+  }
+}
+
+renderQuestion();
+</script>
+
+</body>
+</html>

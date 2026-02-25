@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spin The Wheel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#ffeaf4;
+  --brown:#5c3a1e;
+  --beige:#f6e7d3;
+  --tan:#e8c8a3;
+  --shadow:rgba(0,0,0,0.12);
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  background:var(--bg);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--brown);
+  padding:30px 16px;
+}
+
+.title{
+  font-family:Lobster,cursive;
+  font-size:64px;
+  margin:0;
+  color:var(--brown);
+  text-align:center;
+}
+
+.subtitle{
+  margin:10px 0 20px;
+  font-size:18px;
+  font-weight:700;
+  opacity:0.75;
+  text-align:center;
+}
+
+.wheelWrap{
+  position:relative;
+  width:360px;
+  height:360px;
+  display:grid;
+  place-items:center;
+}
+
+canvas{
+  width:360px;
+  height:360px;
+  border-radius:50%;
+  filter:drop-shadow(0 25px 45px var(--shadow));
+}
+
+.ring{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:12px solid var(--brown);
+  pointer-events:none;
+}
+
+.centerDot{
+  position:absolute;
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  background:#fff;
+  border:8px solid var(--brown);
+  box-shadow:0 12px 25px rgba(0,0,0,0.10);
+  pointer-events:none;
+}
+
+.pointer{
+  position:absolute;
+  top:-18px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:20px solid transparent;
+  border-right:20px solid transparent;
+  border-bottom:32px solid var(--brown);
+  filter:drop-shadow(0 10px 14px rgba(0,0,0,0.10));
+}
+
+.btnRow{
+  margin-top:22px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+.btn{
+  padding:16px 28px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  background:rgba(92,58,30,0.18);
+  color:var(--brown);
+  font-weight:800;
+  font-size:16px;
+  box-shadow:0 15px 30px rgba(0,0,0,0.08);
+  transition:0.2s ease;
+}
+
+.btn:hover{
+  transform:scale(1.06);
+  background:rgba(92,58,30,0.28);
+}
+
+.btn.primary{
+  background:var(--brown);
+  color:#fff;
+}
+
+.btn.primary:hover{
+  opacity:0.92;
+}
+
+.btn:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+  transform:none;
+}
+
+.result{
+  margin-top:16px;
+  display:none;
+  background:rgba(255,255,255,0.75);
+  border:1px solid rgba(92,58,30,0.2);
+  padding:14px 18px;
+  border-radius:20px;
+  font-size:16px;
+  font-weight:800;
+  text-align:center;
+  max-width:420px;
+  line-height:1.35;
+}
+</style>
+</head>
+
+<body>
+  <h1 class="title">Spin The Wheel</h1>
+  <div class="subtitle">Only your filtered recommendations 🎯</div>
+
+  <div class="wheelWrap">
+    <div class="pointer"></div>
+    <canvas id="wheel"></canvas>
+    <div class="ring"></div>
+    <div class="centerDot"></div>
+  </div>
+
+  <div class="btnRow">
+    <button class="btn primary" id="spinBtn">Spin 🎡</button>
+    <button class="btn" onclick="window.location.href='index.html'">Home 🏠</button>
+    <button class="btn" onclick="window.location.href='recommendation.html'">Back ↩</button>
+  </div>
+
+  <div class="result" id="result"></div>
+
+<script>
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const spinBtn = document.getElementById("spinBtn");
+const resultEl = document.getElementById("result");
+
+const COLORS = ["#f6e7d3", "#e8c8a3"];
+const BROWN = "#5c3a1e";
+
+let currentAngle = 0;
+let spinning = false;
+
+/* -------- load recommended dish items --------
+Expected shape from recommendation.html:
+[{ dish, stall, unit, price, cuisine, meal_type, score }]
+*/
+const saved = localStorage.getItem("hawkergo_wheel_items");
+let wheelItems = [];
+try{
+  wheelItems = saved ? JSON.parse(saved) : [];
+}catch{
+  wheelItems = [];
+}
+
+if(!Array.isArray(wheelItems) || wheelItems.length === 0){
+  // fallback if user opens wheel directly
+  wheelItems = [
+    { dish:"Ban Mee", stall:"Qiu Lian Ban Mee", price:7.30 },
+    { dish:"Fish and Chips Set", stall:"Confirm+Chop Western Grill", price:11.20 },
+    { dish:"Pineapple Fried Rice", stall:"Tidjai Thai Food", price:6.00 },
+    { dish:"Taiwanese Chicken Cutlet Rice", stall:"Formosa Delights", price:7.90 },
+    { dish:"Peanut Min Jiang Kueh", stall:"Munchi Pancakes", price:2.20 },
+    { dish:"Saba Fish Set", stall:"Kim Dae Bak Korean Cuisine", price:10.00 }
+  ];
+}
+
+/* Canvas sizing */
+function setupCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  const cssSize = canvas.getBoundingClientRect().width;
+  canvas.width = Math.floor(cssSize * dpr);
+  canvas.height = Math.floor(cssSize * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+/* Fit label width */
+function fitFontToWidth(text, maxWidth, startPx){
+  let px = startPx;
+  ctx.font = `${px}px Lobster`;
+  while(ctx.measureText(text).width > maxWidth && px > 14){
+    px -= 1;
+    ctx.font = `${px}px Lobster`;
+  }
+  return px;
+}
+
+function drawWheel(angle){
+  const size = canvas.getBoundingClientRect().width;
+  const cx = size/2;
+  const cy = size/2;
+  const r = size/2;
+
+  ctx.clearRect(0,0,size,size);
+
+  const slice = (Math.PI * 2) / wheelItems.length;
+
+  for(let i=0;i<wheelItems.length;i++){
+    const start = angle + i * slice;
+    const end = start + slice;
+
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r-8,start,end);
+    ctx.closePath();
+    ctx.fillStyle = COLORS[i % 2];
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(92,58,30,0.16)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    const mid = start + slice/2;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(mid);
+
+    if(mid > Math.PI/2 && mid < 3*Math.PI/2) ctx.rotate(Math.PI);
+
+    ctx.fillStyle = BROWN;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const textRadius = r * 0.60;
+    const chord = 2 * textRadius * Math.sin(slice/2);
+    const maxWidth = chord * 0.85;
+
+    const label = wheelItems[i].dish;
+    const px = fitFontToWidth(label, maxWidth, 28);
+
+    ctx.font = `${px}px Lobster`;
+    ctx.fillText(label, textRadius, 0);
+
+    ctx.restore();
+  }
+}
+
+function getWinner(angle){
+  const slice = (Math.PI * 2) / wheelItems.length;
+  const pointerAngle = -Math.PI/2;
+  let a = (pointerAngle - angle) % (Math.PI * 2);
+  if(a < 0) a += Math.PI * 2;
+  return Math.floor(a / slice);
+}
+
+function easeOutCubic(t){
+  return 1 - Math.pow(1 - t, 3);
+}
+
+function fmtPrice(p){
+  if(typeof p !== "number") return "";
+  return `$${p.toFixed(2)}`;
+}
+
+function spin(){
+  if(spinning) return;
+  if(wheelItems.length < 2) return;
+
+  spinning = true;
+  spinBtn.disabled = true;
+  resultEl.style.display = "none";
+
+  const slice = (Math.PI * 2) / wheelItems.length;
+  const target = Math.floor(Math.random() * wheelItems.length);
+
+  const pointerAngle = -Math.PI/2;
+  const targetCenter = target * slice + slice/2;
+  const finalAngle = pointerAngle - targetCenter;
+
+  const spins = 6;
+  const startAngle = currentAngle;
+  const endAngle = finalAngle + spins * Math.PI * 2;
+
+  const duration = 3200;
+  const start = performance.now();
+
+  function animate(now){
+    const t = Math.min(1, (now - start) / duration);
+    const eased = easeOutCubic(t);
+
+    currentAngle = startAngle + (endAngle - startAngle) * eased;
+    drawWheel(currentAngle);
+
+    if(t < 1){
+      requestAnimationFrame(animate);
+    }else{
+      const win = getWinner(currentAngle);
+      const item = wheelItems[win];
+
+      resultEl.style.display = "block";
+      resultEl.innerHTML =
+        `🎉 You got: <b>${item.dish}</b><br>` +
+        `from <b>${item.stall}</b>` +
+        (item.price ? ` (${fmtPrice(item.price)})` : ``);
+
+      spinBtn.disabled = false;
+      spinning = false;
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+window.addEventListener("resize", () => {
+  setupCanvas();
+  drawWheel(currentAngle);
+});
+
+spinBtn.addEventListener("click", spin);
+
+setupCanvas();
+drawWheel(currentAngle);
+</script>
+
+</body>
+</html>

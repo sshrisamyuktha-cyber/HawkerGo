@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Recommendations</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#fffbe6;
+  --card:#fff6cc;
+  --brown:#5c3a1e;
+  --button:#ffeaa7;
+  --shadow:rgba(0,0,0,0.08);
+  --radius:28px;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  color:var(--brown);
+  display:flex;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+.container{
+  width:100%;
+  max-width:950px;
+}
+
+.title{
+  font-family:'Lobster',cursive;
+  font-size:56px;
+  text-align:center;
+  margin:0 0 8px;
+}
+
+.subtitle{
+  text-align:center;
+  margin:0 0 26px;
+  opacity:0.8;
+}
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:28px;
+  box-shadow:0 20px 40px var(--shadow);
+}
+
+.grid{
+  display:grid;
+  gap:18px;
+}
+
+.rec{
+  background:#fff;
+  border-radius:22px;
+  padding:18px 18px 16px;
+  box-shadow:0 10px 22px rgba(0,0,0,0.06);
+  border:1px solid rgba(92,58,30,0.08);
+}
+
+.dishRow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding-bottom:10px;
+  border-bottom:1px dashed rgba(92,58,30,0.15);
+}
+
+.dishName{
+  font-weight:800;
+  font-size:16px;
+  line-height:1.2;
+}
+
+.dishMeta{
+  margin-top:6px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  opacity:0.9;
+  font-size:12px;
+}
+
+.pill{
+  background:rgba(92,58,30,0.08);
+  border:1px solid rgba(92,58,30,0.10);
+  padding:5px 10px;
+  border-radius:999px;
+  font-weight:700;
+}
+
+.price{
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.bottom{
+  margin-top:12px;
+}
+
+.stallName{
+  font-weight:900;
+  font-size:18px;
+  margin:0;
+}
+
+.unit{
+  margin-top:4px;
+  font-size:12px;
+  opacity:0.75;
+}
+
+.actions{
+  margin-top:22px;
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+.btn{
+  padding:14px 20px;
+  border-radius:999px;
+  border:none;
+  font-weight:900;
+  cursor:pointer;
+  transition:0.2s ease;
+  font-size:14px;
+}
+
+.primary{ background:var(--brown); color:#fff; }
+.secondary{ background:rgba(92,58,30,0.12); color:var(--brown); }
+
+.btn:hover{ transform:scale(1.04); opacity:0.95; }
+
+.note{
+  text-align:center;
+  margin-top:14px;
+  font-size:12px;
+  opacity:0.75;
+  line-height:1.35;
+}
+
+@media (max-width: 600px){
+  body{ padding:26px 14px; }
+  .title{ font-size:44px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1 class="title">Recommendations</h1>
+  <div class="subtitle">Filtered to match your quiz answers 🎯</div>
+
+  <div class="card">
+    <div class="grid" id="recGrid"></div>
+
+    <div class="actions">
+      <button class="btn primary" onclick="goToWheel()">Spin The Wheel Instead! 🎡</button>
+      <button class="btn secondary" onclick="startOver()">Start Over</button>
+    </div>
+
+    <div class="note" id="noteText"></div>
+  </div>
+</div>
+
+<script>
+/* -----------------------------
+   1) READ QUIZ ANSWERS
+--------------------------------*/
+function loadAnswers(){
+  try{
+    const a = JSON.parse(localStorage.getItem("hawkergo_answers") || "{}");
+    return {
+      diet: Array.isArray(a.diet) ? a.diet : [],
+      allergens: Array.isArray(a.allergens) ? a.allergens : [],
+      meal_type: typeof a.meal_type === "string" ? a.meal_type : "any",
+      price: typeof a.price === "string" ? a.price : "any"
+    };
+  } catch {
+    return { diet: [], allergens: [], meal_type:"any", price:"any" };
+  }
+}
+
+/* -----------------------------
+   2) DATASET (STALLS + DISHES)
+   - Each dish has:
+     meal_type: rice | noodles | sides
+     allergens: ["seafood","dairy","gluten","nuts"] (best-effort)
+     flags: ["pork","beef","seafood","vegetarian","halal_ok"]
+--------------------------------*/
+const stalls = [
+  {
+    stall:"Kim Dae Bak Korean Cuisine",
+    unit:"#01-XX",
+    cuisine:"Korean",
+    dishes:[
+      { name:"Saba Fish Set", price:10.00, meal_type:"rice", flags:["seafood"], allergens:["seafood"] },
+      { name:"Bulgogi Chicken Set", price:10.00, meal_type:"rice", flags:[], allergens:[] },
+      { name:"Bulgogi Beef Set", price:11.40, meal_type:"rice", flags:["beef"], allergens:[] },
+      { name:"Sambal Saba Fish Set", price:11.00, meal_type:"rice", flags:["seafood"], allergens:["seafood"] },
+      { name:"Chicken Dol Sot Bibimbap", price:11.00, meal_type:"rice", flags:[], allergens:[] },
+      { name:"Beef Dol Sot Bibimbap", price:12.40, meal_type:"rice", flags:["beef"], allergens:[] },
+      { name:"Salmon Dol Sot Bibimbap", price:12.40, meal_type:"rice", flags:["seafood"], allergens:["seafood"] },
+      { name:"Beef Bulgogi + Chicken Sundubu Jjigae", price:16.40, meal_type:"rice", flags:["beef"], allergens:["dairy"] },
+      { name:"Chicken Bulgogi + Chicken Sundubu Jjigae", price:15.41, meal_type:"rice", flags:[], allergens:["dairy"] }
+    ]
+  },
+  {
+    stall:"Roadside Stall – Malaysian Curry Rice",
+    unit:"#01-XX",
+    cuisine:"Malay",
+    dishes:[
+      { name:"Pork Chop Curry Rice Set", price:7.00, meal_type:"rice", flags:["pork"], allergens:[] },
+      { name:"Pork Belly Curry Rice Set", price:7.00, meal_type:"rice", flags:["pork"], allergens:[] },
+      { name:"Chicken Drumstick Curry Rice Set", price:7.00, meal_type:"rice", flags:[], allergens:[] },
+      { name:"Chicken Chop Curry Rice Set", price:7.00, meal_type:"rice", flags:[], allergens:[] },
+      { name:"Batang Fish Curry Rice Set", price:8.00, meal_type:"rice", flags:["seafood"], allergens:["seafood"] },
+      { name:"Signature Curry Rice Set", price:9.80, meal_type:"rice", flags:[], allergens:[] },
+      { name:"Sambal Sotong Curry Rice Set", price:8.00, meal_type:"rice", flags:["seafood"], allergens:["seafood"] },
+      { name:"Shrimp Paste Chicken Wing Curry Rice Set", price:6.50, meal_type:"rice", flags:["seafood"], allergens:["seafood"] },
+      { name:"Fish Fillet Curry Rice Set", price:8.00, meal_type:"rice", flags:["seafood"], allergens:["seafood"] }
+    ]
+  },
+  {
+    stall:"Qiu Lian Ban Mee",
+    unit:"#01-XX",
+    cuisine:"Chinese",
+    dishes:[
+      { name:"Ban Mee", price:7.30, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"You Mee", price:7.30, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Mee Hoon Kuay", price:7.30, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Bee Hoon Soup", price:7.30, meal_type:"noodles", flags:[], allergens:[] },
+      { name:"Yee Mian Soup", price:7.30, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Mee Sua Soup", price:7.30, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Big Prawns Ban Mee", price:8.30, meal_type:"noodles", flags:["seafood"], allergens:["seafood","gluten"] },
+      { name:"Tom Yum Mee Hoon Kuay", price:7.80, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Tom Yum You Mee", price:7.80, meal_type:"noodles", flags:[], allergens:["gluten"] }
+    ]
+  },
+  {
+    stall:"Confirm+Chop Western Grill",
+    unit:"#01-13",
+    cuisine:"Western",
+    dishes:[
+      { name:"Fish and Chips Set", price:11.20, meal_type:"sides", flags:["seafood"], allergens:["seafood","gluten"] },
+      { name:"Fried Chicken Cutlet with Fries", price:11.20, meal_type:"sides", flags:[], allergens:["gluten"] },
+      { name:"Grilled Dory Fish with Fries", price:11.20, meal_type:"sides", flags:["seafood"], allergens:["seafood"] },
+      { name:"Grilled Sausages with Fried Rice", price:11.20, meal_type:"rice", flags:[], allergens:[] },
+      { name:"Angus Beef Burger", price:10.80, meal_type:"sides", flags:["beef"], allergens:["gluten"] },
+      { name:"Chicken Burger", price:8.90, meal_type:"sides", flags:[], allergens:["gluten"] },
+      { name:"Battered Fried Fish with Pasta", price:11.20, meal_type:"noodles", flags:["seafood"], allergens:["seafood","gluten"] },
+      { name:"Grilled Chicken Chop with Pasta", price:11.20, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Buddy Set 1", price:26.80, meal_type:"sides", flags:[], allergens:[] },
+      { name:"Buddy Set 2", price:26.80, meal_type:"sides", flags:[], allergens:[] }
+    ]
+  },
+  {
+    stall:"Formosa Delights",
+    unit:"#01-XX",
+    cuisine:"Taiwan",
+    dishes:[
+      { name:"Taiwan Chicken Mee Sua", price:7.20, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Taiwanese Chicken Cutlet Rice", price:7.90, meal_type:"rice", flags:[], allergens:["gluten"] },
+      { name:"Sesame Oil Chicken Noodles", price:8.50, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Braised Pork Rice", price:8.50, meal_type:"rice", flags:["pork"], allergens:[] },
+      { name:"Dry Noodle with Fried Sauce", price:7.90, meal_type:"noodles", flags:[], allergens:["gluten"] },
+      { name:"Pig Trotter (Rice/Noodle)", price:7.90, meal_type:"rice", flags:["pork"], allergens:[] },
+      { name:"Olive Vegetable Noodles", price:8.50, meal_type:"noodles", flags:["vegetarian"], allergens:["gluten"] }
+    ]
+  },
+  {
+    stall:"Tidjai Thai Food",
+    unit:"#01-XX",
+    cuisine:"Thai",
+    dishes:[
+      { name:"Thai Fried Rice (Pork/Chicken/Seafood)", price:6.00, meal_type:"rice", flags:[], allergens:["seafood"] },
+      { name:"Pineapple Fried Rice", price:6.00, meal_type:"rice", flags:[], allergens:[] },
+      { name:"Phad Thai", price:6.00, meal_type:"noodles", flags:[], allergens:["nuts"] },
+      { name:"Tom Yum Soup", price:7.20, meal_type:"sides", flags:[], allergens:["seafood"] },
+      { name:"Thai Mango Salad", price:6.20, meal_type:"sides", flags:["vegetarian"], allergens:["nuts"] },
+      { name:"Moo Ping (3 pcs)", price:6.00, meal_type:"sides", flags:["pork"], allergens:[] },
+      { name:"Thai Chicken Wing (4 pcs)", price:8.20, meal_type:"sides", flags:[], allergens:[] },
+      { name:"Thai Prawn Cake (4 pcs)", price:12.00, meal_type:"sides", flags:["seafood"], allergens:["seafood"] },
+      { name:"Thai Prawn Vermicelli", price:14.30, meal_type:"noodles", flags:["seafood"], allergens:["seafood"] },
+      { name:"Thai Lemon Steamed Seabass", price:25.50, meal_type:"sides", flags:["seafood"], allergens:["seafood"] },
+      { name:"Deep Fried Garlic Pork", price:7.00, meal_type:"sides", flags:["pork"], allergens:[] }
+    ]
+  },
+  {
+    stall:"Guan Chee Roasted",
+    unit:"#01-XX",
+    cuisine:"Chinese",
+    dishes:[
+      { name:"Old Cucumber Pork Ribs Soup", price:7.80, meal_type:"sides", flags:["pork"], allergens:[] },
+      { name:"Lotus Root Pork Ribs Soup", price:7.80, meal_type:"sides", flags:["pork"], allergens:[] },
+      { name:"Char Siew Wanton Noodle", price:8.80, meal_type:"noodles", flags:["pork"], allergens:["gluten"] },
+      { name:"Shrimp Dumpling Noodle", price:8.80, meal_type:"noodles", flags:["seafood"], allergens:["seafood","gluten"] },
+      { name:"One Quarter Roasted Duck", price:20.00, meal_type:"sides", flags:[], allergens:[] },
+      { name:"One Whole Roasted Duck", price:70.00, meal_type:"sides", flags:[], allergens:[] }
+    ]
+  },
+  {
+    stall:"Munchi Pancakes",
+    unit:"#01-XX",
+    cuisine:"Dessert",
+    dishes:[
+      { name:"Peanut Min Jiang Kueh", price:2.20, meal_type:"sides", flags:["vegetarian"], allergens:["nuts","gluten"] },
+      { name:"Red Bean Min Jiang Kueh", price:2.20, meal_type:"sides", flags:["vegetarian"], allergens:["gluten"] },
+      { name:"Black Sesame Min Jiang Kueh", price:2.60, meal_type:"sides", flags:["vegetarian"], allergens:["gluten"] },
+      { name:"Biscoff MJK", price:3.20, meal_type:"sides", flags:["vegetarian"], allergens:["gluten"] },
+      { name:"Hazelnut Munchi", price:3.00, meal_type:"sides", flags:["vegetarian"], allergens:["nuts"] },
+      { name:"Strawberry Cheese Munchi", price:3.00, meal_type:"sides", flags:["vegetarian"], allergens:["dairy"] }
+    ]
+  },
+  {
+    stall:"Hai Li Fang Seafood Zichar",
+    unit:"#01-XX",
+    cuisine:"Zichar",
+    dishes:[
+      { name:"Deep-Fried Sea Bass", price:18.80, meal_type:"sides", flags:["seafood"], allergens:["seafood"] },
+      { name:"BBQ Sambal Stingray", price:23.80, meal_type:"sides", flags:["seafood"], allergens:["seafood"] },
+      { name:"Salted Egg Diced Chicken", price:21.00, meal_type:"sides", flags:[], allergens:["dairy"] },
+      { name:"Prawn Paste Chicken", price:17.80, meal_type:"sides", flags:["seafood"], allergens:["seafood"] },
+      { name:"Ginger and Onion Beef", price:21.80, meal_type:"sides", flags:["beef"], allergens:[] },
+      { name:"Homemade Specialty Bean Curd", price:17.50, meal_type:"sides", flags:["vegetarian"], allergens:["dairy"] }
+    ]
+  }
+];
+
+/* -----------------------------
+   3) FILTERING + SCORING
+--------------------------------*/
+function inBudget(priceVal, range){
+  if(range === "any") return true;
+  const [lo, hi] = range.split("-").map(Number);
+  return priceVal >= lo && priceVal <= hi;
+}
+
+function failsDiet(dietSet, flags){
+  if(dietSet.has("none")) return false;
+
+  if(dietSet.has("no_pork") && flags.includes("pork")) return true;
+  if(dietSet.has("no_beef") && flags.includes("beef")) return true;
+
+  // Vegetarian: reject pork/beef/seafood + any non-veg (best effort)
+  if(dietSet.has("vegetarian")){
+    if(flags.includes("pork") || flags.includes("beef") || flags.includes("seafood")) return true;
+    // if not explicitly vegetarian, allow (best-effort)
+  }
+
+  // Halal: best-effort — reject pork; beef is allowed but if user wants halal, we keep pork out
+  if(dietSet.has("halal")){
+    if(flags.includes("pork")) return true;
+  }
+
+  return false;
+}
+
+function failsAllergens(allergenSet, allergens){
+  if(allergenSet.has("none")) return false;
+  for(const a of allergenSet){
+    if(allergens.includes(a)) return true;
+  }
+  return false;
+}
+
+function scoreCandidate(c, answers){
+  let score = 0;
+
+  const diet = new Set(answers.diet);
+  const allergenSet = new Set(answers.allergens);
+
+  // meal type bonus
+  if(answers.meal_type !== "any"){
+    score += (c.meal_type === answers.meal_type) ? 25 : -10;
+  } else {
+    score += 6;
+  }
+
+  // budget bonus
+  if(answers.price !== "any"){
+    score += inBudget(c.price, answers.price) ? 20 : -15;
+  } else {
+    score += 6;
+  }
+
+  // diet bonuses
+  if(diet.has("halal") && !c.flags.includes("pork")) score += 6;
+  if(diet.has("vegetarian") && (c.flags.includes("vegetarian"))) score += 10;
+
+  // allergen-safe bonus
+  if(!allergenSet.has("none") && c.allergens.length === 0) score += 4;
+
+  // small preference: cheaper within budget
+  score += Math.max(0, 12 - c.price);
+
+  return score;
+}
+
+/* -----------------------------
+   4) BUILD RECOMMENDATIONS
+--------------------------------*/
+let recommendedStallsForWheel = [];
+
+function buildRecommendations(){
+  const answers = loadAnswers();
+
+  const dietSet = new Set(answers.diet);
+  const allergenSet = new Set(answers.allergens);
+
+  // flatten dishes
+  let candidates = [];
+  stalls.forEach(s => {
+    s.dishes.forEach(d => {
+      const c = {
+        stall: s.stall,
+        unit: s.unit,
+        cuisine: s.cuisine,
+        dish: d.name,
+        price: d.price,
+        meal_type: d.meal_type,
+        flags: d.flags || [],
+        allergens: d.allergens || []
+      };
+
+      // hard filters
+      if(answers.meal_type !== "any" && c.meal_type !== answers.meal_type) return;
+      if(answers.price !== "any" && !inBudget(c.price, answers.price)) return;
+      if(failsDiet(dietSet, c.flags)) return;
+      if(failsAllergens(allergenSet, c.allergens)) return;
+
+      c.score = scoreCandidate(c, answers);
+      candidates.push(c);
+    });
+  });
+
+  candidates.sort((a,b) => b.score - a.score);
+
+  // pick top 6 unique dish entries
+  const top = candidates.slice(0, 6);
+
+  // wheel stalls: unique stall names from top
+  const uniqStalls = [];
+  top.forEach(t => { if(!uniqStalls.includes(t.stall)) uniqStalls.push(t.stall); });
+  recommendedStallsForWheel = uniqStalls;
+
+  render(top, answers);
+}
+
+function fmtPrice(n){
+  return `$${n.toFixed(2)}`;
+}
+
+function render(list, answers){
+  const grid = document.getElementById("recGrid");
+  grid.innerHTML = "";
+
+  if(list.length === 0){
+    grid.innerHTML = `
+      <div class="rec">
+        <div class="dishName">No matches found 🥲</div>
+        <div class="dishMeta">
+          <span class="pill">Try: pick “No Preference” for meal type</span>
+          <span class="pill">or set budget to “Any”</span>
+          <span class="pill">or remove an allergen</span>
+        </div>
+      </div>
+    `;
+  } else {
+    list.forEach((r) => {
+      const el = document.createElement("div");
+      el.className = "rec";
+      el.innerHTML = `
+        <div class="dishRow">
+          <div>
+            <div class="dishName">${r.dish}</div>
+            <div class="dishMeta">
+              <span class="pill">🍽️ ${r.meal_type}</span>
+              <span class="pill">🏷️ ${r.cuisine}</span>
+            </div>
+          </div>
+          <div class="price">${fmtPrice(r.price)}</div>
+        </div>
+
+        <div class="bottom">
+          <p class="stallName">${r.stall}</p>
+          <div class="unit">${r.unit}</div>
+        </div>
+      `;
+      grid.appendChild(el);
+    });
+  }
+
+  document.getElementById("noteText").innerText =
+    `Filters used → Dietary: ${(answers.diet||[]).join(", ") || "—"} | Allergens: ${(answers.allergens||[]).join(", ") || "—"} | Meal: ${answers.meal_type || "any"} | Budget: ${answers.price || "any"}`;
+}
+
+/* -----------------------------
+   5) BUTTON ACTIONS
+--------------------------------*/
+function goToWheel(){
+  const labels = recommendedStallsForWheel.length ? recommendedStallsForWheel : stalls.map(s => s.stall);
+  localStorage.setItem("hawkergo_quiz_recs", JSON.stringify(labels));
+  window.location.href = "wheel.html";
+}
+
+function startOver(){
+  localStorage.removeItem("hawkergo_answers");
+  localStorage.removeItem("hawkergo_quiz_recs");
+  window.location.href = "quiz.html";
+}
+
+buildRecommendations();
+</script>
+</body>
+</html>

@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Noodle Master Menu</title>
-<link rel="stylesheet" href="menu.css">
-<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Qiu Lian Ban Mee</title>
+<link rel="stylesheet" href="menu.css" />
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 </head>
-
 <body>
-
 <header class="menu-header">
-    <h1>🍜 Noodle Master</h1>
-    <p>Chinese • Non-Halal • ⭐ 4.8</p>
+  <h1>🍜 Qiu Lian Ban Mee</h1>
+  <p>Chinese • Non-Halal • ⭐ 4.5</p>
 </header>
 
 <div style="margin: 20px 0;">
@@ -20,105 +18,41 @@
 </div>
 
 <div class="menu-container">
+  <aside class="categories">
+    <button class="active" onclick="showCategory('regular')">Regular</button>
+    <button onclick="showCategory('special')">Special</button>
+    <button onclick="showCategory('tomyum')">Tom Yum</button>
+  </aside>
 
-    <!-- CATEGORY SIDEBAR -->
-    <aside class="categories">
-        <button class="active" onclick="showCategory('noodles', event)">Noodles</button>
-        <button onclick="showCategory('rice', event)">Rice</button>
-        <button onclick="showCategory('sides', event)">Sides</button>
-        <button onclick="showCategory('drinks', event)">Drinks</button>
-    </aside>
+  <section class="food-grid">
 
-    <!-- FOOD DISPLAY -->
-    <section class="food-grid">
+    <div class="category regular">
+      <div class="food-card"><h3>Ban Mee</h3><p>$7.30</p></div>
+      <div class="food-card"><h3>You Mee</h3><p>$7.30</p></div>
+      <div class="food-card"><h3>Mee Hoon Kuay</h3><p>$7.30</p></div>
+      <div class="food-card"><h3>Bee Hoon Soup</h3><p>$7.30</p></div>
+      <div class="food-card"><h3>Yee Mian Soup</h3><p>$7.30</p></div>
+      <div class="food-card"><h3>Mee Sua Soup</h3><p>$7.30</p></div>
+    </div>
 
-        <!-- NOODLES -->
-        <div class="category noodles">
+    <div class="category special hidden">
+      <div class="food-card"><h3>Big Prawns Ban Mee</h3><p>$8.30</p></div>
+    </div>
 
-            <!-- Beef Laksa -->
-            <div class="food-card">
-                <img src="beef.png" alt="Beef Laksa" width="100%">
-                <h3>Beef Laksa</h3>
-                <p>⭐ 4.4</p>
-                <p>#01-27</p>
-                <p>Wait: 20 mins</p>
-                <p>$5.50</p>
-            </div>
+    <div class="category tomyum hidden">
+      <div class="food-card"><h3>Tom Yum Mee Hoon Kuay</h3><p>$7.80</p></div>
+      <div class="food-card"><h3>Tom Yum You Mee</h3><p>$7.80</p></div>
+    </div>
 
-
-            <!-- Mee Goreng -->
-            <div class="food-card">
-                <img src="me.png" alt="Mee Goreng" width="100%">
-                <h3>Mee Goreng</h3>
-                <p>⭐ 4.9</p>
-                <p>#01-27</p>
-                <p>Wait: 10 mins</p>
-                <p>$6.00</p>
-            </div>
-
-
-        </div> <!-- ✅ CLOSE NOODLES -->
-
-        <!-- RICE -->
-        <div class="category rice hidden">
-            <div class="food-card">
-                <h3>Yang Zhou Fried Rice</h3>
-                <p>$6.50</p>
-            </div>
-
-            <div class="food-card">
-                <h3>Chicken Rice</h3>
-                <p>$5.80</p>
-            </div>
-        </div>
-
-        <!-- SIDES -->
-        <div class="category sides hidden">
-            <div class="food-card">
-                <h3>Steamed Dumplings</h3>
-                <p>$4.50</p>
-            </div>
-
-            <div class="food-card">
-                <h3>Spring Rolls</h3>
-                <p>$3.50</p>
-            </div>
-        </div>
-
-        <!-- DRINKS -->
-        <div class="category drinks hidden">
-            <div class="food-card">
-                <h3>Chinese Tea</h3>
-                <p>$1.50</p>
-            </div>
-
-            <div class="food-card">
-                <h3>Iced Lemon Tea</h3>
-                <p>$2.00</p>
-            </div>
-        </div>
-
-    </section>
-
+  </section>
 </div>
 
 <script>
-function showCategory(type, event) {
-
-    // Hide all categories
-    document.querySelectorAll('.category').forEach(cat => {
-        cat.classList.add('hidden');
-    });
-
-    // Show selected
-    document.querySelector('.' + type).classList.remove('hidden');
-
-    // Update active button
-    document.querySelectorAll('.categories button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    event.target.classList.add('active');
+function showCategory(type) {
+  document.querySelectorAll('.category').forEach(cat => cat.classList.add('hidden'));
+  document.querySelector('.' + type).classList.remove('hidden');
+  document.querySelectorAll('.categories button').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
 }
 </script>
 

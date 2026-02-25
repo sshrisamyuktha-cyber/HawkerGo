@@ -4,144 +4,159 @@ padding:0;
 box-sizing:border-box;
 }
 
-body{
-background:#f8ca89;
-font-family:'Poppins', sans-serif;
-color:#010101;
+body {
+  background-image: url("bg.jpg");
+  background-size: cover;        /* fills entire screen */
+  background-position: center;   /* keeps it centered */
+  background-repeat: no-repeat;  /* prevents tiling */
+  background-attachment: fixed;  /* optional: slight parallax effect */
+  font-family:'Poppins', sans-serif;
+  color:#0b1c11;
 }
-
 /* ================= NAV ================= */
 
 nav{
-padding:20px;
-background:rgb(248, 246, 245);
-box-shadow:0 2px 10px rgba(0,0,0,0.05);
+  padding:20px;
+  background:rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:0 2px 10px rgba(11, 85, 189, 0.977);
 }
 
 .nav-container{
-display:flex;
-justify-content:center;
-align-items:center;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
 nav h1{
-font-family:'Lobster', cursive;
-font-size:48px;
-color:#020202f7;
-letter-spacing:1px;
+  font-family:'Lobster', cursive;
+  font-size:48px;
+  color:#0e1554f7;
+  letter-spacing:1px;
 }
 
 /* HERO */
 
 .hero{
-text-align:center;
-padding:60px 20px 20px;
+  text-align:center;
+  padding:60px 20px 20px;
 }
 
-.hero h1{
-font-family:'Lobster', cursive;
-font-size:36px;
-margin-bottom:10px;
+.hero-box{
+  display:inline-block;
+  padding:25px 40px;
+  border:3px solid #0d3b66;
+  border-radius:18px;
+  background:rgba(255,255,255,0.85);
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
 }
+.hero h1{
+  font-family:'Lobster', cursive;
+  font-size:36px;
+  color: #13154b;
+  margin-bottom:10px;
+  }
 
 h1{
-font-family:'Lobster', cursive;
+  font-family:'Lobster', cursive;
+  color: #13154b;
 }
 
 .hero p{
-color:#030303;
-font-size:18px;
+  color:#030303;
+  font-size:18px;
 }
 
 .quiz-btn{
-display:inline-block;
-margin-top:25px;
-padding:14px 28px;
-border-radius:50px;
-font-weight:600;
-text-decoration:none;
-background:#ea7a2a;
-color:rgb(6, 6, 6);
-box-shadow:0 8px 20px rgba(255,122,24,0.25);
-transition:0.2s;
+  display:inline-block;
+  margin-top:25px;
+  padding:14px 28px;
+  border-radius:50px;
+  font-weight:600;
+  text-decoration:none;
+  background:#e2e1e3;
+  color:rgb(6, 6, 6);
+  box-shadow:0 8px 20px rgba(255,122,24,0.25);
+  transition:0.2s;
 }
 
 .quiz-btn:hover{
-transform:translateY(-3px);
+  transform:translateY(-3px);
 }
 
 
 /* MAP SECTION */
 
-.map-section{
-padding:30px 20px;        /* reduce top padding */
+.map-wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  max-width: 1300px;
+  margin: 30px auto;
+  flex-wrap: nowrap;
 }
 
-.map-section h1{
-text-align: center;
-font-size:36px;   /* increase size */
-margin-bottom:15px;
+.map {
+  flex: 0 0 70%;                  /* map takes 70% width */
+  max-width: 2000px;               /* optional max width */
+  position: relative;
 }
 
-.map-wrapper{
-display:flex;
-gap:40px;
-align-items:flex-start;
-justify-content:center;
-margin-top:30px;
+.map-bg {
+  width: 100%;
+  height: auto;
+  border-radius: 18px;
+  display: block;
 }
 
-.map{
-position:relative;
-flex:3;
-max-width:900px;
-}
 
-.map-bg{
-width:100%;
-border-radius:18px;
+.map-title {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 36px;
 }
 
 /* DIAGONAL STALL */
 
 .stall{
-position:absolute;
-width:55px;
-height:55px;
-border-radius:18px;                 /* smoother rounding */
-cursor:pointer;
-transform:translate(-50%, -50%);
-transition:0.25s;
-overflow:visible;
+  position:absolute;
+  width:38px;
+  height:42px;
+  border-radius:14px;                 /* smoother rounding */
+  cursor:pointer;
+  transform:translate(-50%, -50%);
+  transition:0.25s;
+  overflow:visible;
 
 /* Cuisine colour as border */
-border:6px solid var(--cuisine-color);
+  border:6px solid var(--cuisine-color);
 
 /* Wait time colour as center */
-background:var(--wait-color);
+  background:var(--wait-color);
 
 /* soft shadow for depth */
-box-shadow:0 6px 14px rgba(0,0,0,0.15);
+  box-shadow:0 6px 14px rgba(0,0,0,0.15);
 }
 
 .stall:hover{
-transform:translate(-50%, -50%) scale(1.15);
-box-shadow:0 10px 22px rgba(0,0,0,0.25);
-}
-
-
-.stall:hover{
-transform:translate(-50%, -50%) scale(1.15);
+  transform:translate(-50%, -50%) scale(1.15);
+  box-shadow:0 10px 22px rgba(0,0,0,0.25);
 }
 
 /* Cuisine colours */
-.indian{ --cuisine-color:#b5ea61; }
+.malaysian{ --cuisine-color:#f0792a; }
 .chinese{ --cuisine-color:#970505; }
 .western{ --cuisine-color:#fec320; }
-.thai{ --cuisine-color:#e381fc; }
-.peranakan{ --cuisine-color:#e87e1d; }
-.halal{ --cuisine-color:#145a1a; }
-.dessert{ --cuisine-color:#7be8f7; }
+.thai{ --cuisine-color:#090089; }
+.taiwanese{ --cuisine-color:#a20077; }
+.peranakan{ --cuisine-color:#bd4628; }
+.halal{ --cuisine-color:#0e4913; }
+.indian{ --cuisine-color:#f1aa5d; }
+.dessert{ --cuisine-color:#e4bff9; }
+.korean { --cuisine-color:#011018; }
+
 
 /* Wait colours */
 .short{ --wait-color:#a5d6a7; }
@@ -150,115 +165,108 @@ transform:translate(-50%, -50%) scale(1.15);
 
 /* Wait badge */
 .wait-badge{
-position:absolute;
-top:-8px;
-left:-8px;
-width:26px;
-height:26px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-color:white;
-font-size:12px;
-font-weight:bold;
-background:#2c3e50;
+  position:absolute;
+  top:-8px;
+  left:-8px;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-size:12px;
+  font-weight:bold;
+  background:#2c3e50;
 }
 
 /* Popup */
 .popup{
-position:absolute;
-bottom:140%;
-left:50%;
-transform:translateX(-50%);
-background:white;
-padding:15px;
-border-radius:14px;
-width:180px;
-box-shadow:0 10px 30px rgba(0,0,0,0.15);
-opacity:0;
-pointer-events:none;
-transition:0.25s;
-text-align:center;
-z-index:100;
+  position:absolute;
+  bottom:140%;
+  left:50%;
+  transform:translateX(-50%);
+  background:white;
+  padding:15px;
+  border-radius:14px;
+  width:180px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+  opacity:0;
+  pointer-events:none;
+  transition:0.25s;
+  text-align:center;
+  z-index:100;
 }
 
 .stall:hover .popup{
-opacity:1;
+  opacity:1;
 }
 
 .wait-label{
-margin-top:6px;
-padding:6px;
-border-radius:8px;
-font-weight:600;
-font-size:13px;
+  margin-top:6px;
+  padding:6px;
+  border-radius:8px;
+  font-weight:600;
+  font-size:13px;
 }
 
 /* LEGEND */
 
 /* ================= LEGEND (COMPACT VERSION) ================= */
 
-.map-wrapper{
-display:flex;
-gap:25px;
-align-items:flex-start;
-}
-
-/* Make map wider */
-.map{
-flex:4;
-}
-
 /* Smaller legend */
-.side-legend{
-flex:1;                  /* takes less space */
-max-width:180px;         /* limits width */
-background:white;
-padding:12px 14px;       /* smaller padding */
-border-radius:14px;
-box-shadow:0 6px 15px rgba(0,0,0,0.05);
-text-align:left;
-font-size:13px;
+.side-legend {
+  flex: 0 0 28%;                  /* legend takes 28% width */
+  max-width: 300px;               /* optional max width */
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+  text-align: left;
+  font-size: 13px;
+  box-sizing: border-box;
 }
 
 /* Legend title */
 .side-legend h3{
-font-size:16px;
-margin-bottom:10px;
+  font-size:16px;
+  margin-bottom:10px;
 }
 
 /* Section titles */
 .legend-section h4{
-font-size:12px;
-margin-bottom:6px;
-color:#666;
+  font-size:12px;
+  margin-bottom:6px;
+  color:#666;
 }
 
 /* Items */
 .legend-item{
-display:flex;
-align-items:center;
-margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  margin-bottom:6px;
 }
 
 /* Small colour boxes */
 .legend-color{
-width:14px;
-height:14px;
-border-radius:3px;
-margin-right:8px;
-border:1px solid #ddd;   /* so light colours are visible */
+  width:14px;
+  height:14px;
+  border-radius:3px;
+  margin-right:8px;
+  border:1px solid #ddd;   /* so light colours are visible */
 }
 
 /* Cuisine legend colours */
-.legend-color.indian{ background:#b5ea61; }
+.legend-color.malaysian{ background:#f0792a; }
 .legend-color.chinese{ background:#970505; }
 .legend-color.western{ background:#fec320; }
-.legend-color.thai{ background:#e381fc; }
-.legend-color.peranakan{ background:#e87e1d; }
-.legend-color.halal{ background:#145a1a; }
-.legend-color.dessert{ background:#7be8f7; }
+.legend-color.thai{ background:#090089; }
+.legend-color.taiwanese{ background:#a20077; }  
+.legend-color.peranakan{ background:#bd4628; }
+.legend-color.halal{ background:#0e4913; }
+.legend-color.indian{ background:#f1aa5d; }
+.legend-color.dessert{ background:#e4bff9; }
+.legend-color.korean{ background:#011018; }
 
 /* Wait legend colours */
 .legend-color.short{ background:#a5d6a7; }
@@ -269,64 +277,61 @@ border:1px solid #ddd;   /* so light colours are visible */
 /* Dashboard */
 
 .wait-times{
-padding:60px 20px;
-text-align:center;
+  padding:60px 20px;
+  text-align:center;
 }
 
 .cards{
-display:flex;
-justify-content:center;
-gap:30px;
-flex-wrap:wrap;
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  flex-wrap:wrap;
 }
 
 .card{
-width:200px;
-background:white;
-padding:25px;
-border-radius:18px;
-box-shadow:0 8px 20px rgba(0,0,0,0.05);
-text-align:center;
-text-decoration:none;
-color:black;
-transition:0.3s;
+  width:200px;
+  background:white;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.05);
+  text-align:center;
+  text-decoration:none;
+  color:black;
+  transition:0.3s;
 }
 
 .card:hover{
-transform:translateY(-6px);
+  transform:translateY(-6px);
 }
 
 
 .donut{
-width:70px;
-height:70px;
-border-radius:50%;
-margin:15px auto;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-background:#eee;
-position:relative;
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  margin:15px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  position:relative;
 }
 
-/* Short (green clock) */
+/* Dynamic conic gradient */
 .donut.short{
-background:conic-gradient(#a5d6a7 0% 75%, #eee 75%);
+  background:conic-gradient(#a5d6a7 calc(var(--percent)*1%), #eee 0);
 }
 
-/* Medium (yellow clock) */
 .donut.medium{
-background:conic-gradient(#fff59d 0% 75%, #eee 75%);
+  background:conic-gradient(#fff59d calc(var(--percent)*1%), #eee 0);
 }
 
-/* Long (red clock) */
 .donut.long{
-background:conic-gradient(#ef9a9a 0% 75%, #eee 75%);
+  background:conic-gradient(#ef9a9a calc(var(--percent)*1%), #eee 0);
 }
 /* ================= CARD TOP BORDER MATCH LEGEND ================= */
 
-.card.indian{
+.card.malaysian{
 border-top:6px solid #f0792a;
 }
 
@@ -339,19 +344,30 @@ border-top:6px solid #fec320;
 }
 
 .card.thai{
-border-top:6px solid #e381fc;
+border-top:6px solid #090089;
+}
+
+.card.taiwanese{
+border-top:6px solid #a20077;
 }
 
 .card.peranakan{
-border-top:6px solid #e87e1d;
+border-top:6px solid #bd4628;
 }
 
 .card.halal{
-border-top:6px solid #145a1a;
+border-top:6px solid #0e4913;
+}
+
+.card.indian{
+border-top:6px solid #f1aa5d; 
 }
 
 .card.dessert{
-border-top:6px solid #7be8f7;
+border-top:6px solid #e4bff9;
+}
+.card.korean{
+border-top:6px solid #011018;
 }
 /* ================= BOTTOM QUIZ SECTION ================= */
 
@@ -366,7 +382,7 @@ margin-top:60px;
 font-family:'Lobster', cursive;
 font-size:36px;   /* bigger heading */
 margin-bottom:15px;
-color:#000;
+color:#13154b;
 }
 
 .bottom-quiz p{
@@ -381,8 +397,9 @@ padding:18px 40px;     /* bigger button */
 font-size:18px;        /* bigger text */
 font-weight:600;
 border-radius:50px;
-background:#ea7a2a;
-color:#000;
+color:#fff;
+background:#13154b;
+color:#fff;
 text-decoration:none;
 box-shadow:0 10px 25px rgba(234,122,42,0.3);
 transition:0.3s;

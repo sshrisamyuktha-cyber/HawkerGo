@@ -452,3 +452,31 @@ transform:translateY(-5px);
 box-shadow:0 15px 35px rgba(234,122,42,0.4);
 
 }
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+
+  .cards {
+    gap: 15px; /* less space between cards */
+  }
+
+  .card {
+    width: 150px;        /* smaller card */
+    padding: 18px;       /* less padding */
+    border-radius: 14px;
+  }
+
+  .card h3 {
+    font-size: 16px;     /* smaller title */
+  }
+
+  .card p {
+    font-size: 13px;
+  }
+
+  .donut {
+    width: 55px;         /* smaller circle */
+    height: 55px;
+    font-size: 13px;
+  }
+
+}

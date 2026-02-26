@@ -450,6 +450,8 @@ function buildRecommendations(){
 
   // pick top 6 unique dish entries
   const top = candidates.slice(0, 6);
+  // Save top dishes for wheel
+  localStorage.setItem("hawkergo_wheel_items", JSON.stringify(top));
 
   // wheel stalls: unique stall names from top
   const uniqStalls = [];
@@ -511,8 +513,6 @@ function render(list, answers){
    5) BUTTON ACTIONS
 --------------------------------*/
 function goToWheel(){
-  const labels = recommendedStallsForWheel.length ? recommendedStallsForWheel : stalls.map(s => s.stall);
-  localStorage.setItem("hawkergo_quiz_recs", JSON.stringify(labels));
   window.location.href = "wheel.html";
 }
 

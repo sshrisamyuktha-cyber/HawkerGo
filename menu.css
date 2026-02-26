@@ -114,4 +114,48 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
 }
 
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+
+  .menu-container {
+    grid-template-columns: 1fr;   /* stack instead of side-by-side */
+    height: auto;
+  }
+
+  .categories {
+    flex-direction: row;          /* horizontal buttons */
+    overflow-x: auto;             /* allow scrolling */
+    border-right: none;
+    border-bottom: 1px solid #eee;
+    padding: 15px;
+  }
+
+  .categories button {
+    min-width: 120px;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .food-grid {
+    padding: 20px;
+  }
+
+  .category {
+    grid-template-columns: repeat(2, 1fr);  /* 2 cards per row */
+    gap: 15px;
+  }
+
+  .food-card {
+    padding: 25px 15px;
+  }
+
+  .food-card h3 {
+    font-size: 16px;
+  }
+
+  .food-card p {
+    font-size: 18px;
+  }
+
+}
 

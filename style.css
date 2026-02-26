@@ -450,7 +450,6 @@ transition:0.3s;
 .bottom-quiz-btn:hover{
 transform:translateY(-5px);
 box-shadow:0 15px 35px rgba(234,122,42,0.4);
-
 }
 /* ================= MOBILE RESPONSIVE ================= */
 @media (max-width: 768px) {
@@ -480,29 +479,3 @@ box-shadow:0 15px 35px rgba(234,122,42,0.4);
   }
 
 }
-/* ================= MOBILE MAP SHRINK ================= */
-@media (max-width: 768px) {
-
-  .stall {
-    width: 30px;      /* smaller tile */
-    height: 30px;
-    border-width: 4px;
-    border-radius: 10px;
-  }
-
-  .wait-badge {
-    width: 16px;      /* smaller number circle */
-    height: 16px;
-    font-size: 8px;
-    top: -6px;
-    left: -6px;
-  }
-
-  .popup {
-    width: 140px;     /* smaller popup */
-    font-size: 11px;
-    padding: 10px;
-  }
-
-}
-

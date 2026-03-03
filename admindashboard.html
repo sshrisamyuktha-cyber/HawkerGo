@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HawkerGo | Admin Thermal View</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #ff4500;
+        }
+        body { background-color: #f9f9f9; }
+        
+        .admin-thermal-container {
+            background: #121212;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 850px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        /* Container for the canvas to maintain aspect ratio */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #333;
+            line-height: 0; /* Removes bottom spacing */
+        }
+
+        #thermalCanvas {
+            width: 100%;
+            height: auto;
+            /* Applying high-quality smoothing filters */
+            filter: contrast(1.2) brightness(1.1);
+        }
+
+        .stats-overlay {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .count-badge {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-orange);
+        }
+
+        .temp-info {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <div class="nav-container">
+        <h1>🍜 HawkerGo Admin</h1>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-box">
+        <h1>High-Definition Thermal Feed</h1>
+        <p class="subtitle">Real-time queue monitoring via Bilinear Interpolation</p>
+    </div>
+</section>
+
+<div class="admin-thermal-container">
+    <div class="canvas-wrapper">
+        <canvas id="thermalCanvas" width="640" height="480"></canvas>
+    </div>
+    
+    <div class="stats-overlay">
+        <div style="text-align: left;">
+            <div style="color: #888; text-size-adjust: 0.8rem; text-transform: uppercase;">Live Count</div>
+            <div class="count-badge"><span id="peopleCount">0</span> People</div>
+        </div>
+        <div class="temp-info">
+            Range: 32°C - 37°C<br>
+            Mode: High Interpolation
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // 1. Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDcWcKPklNBt4Iqm4bwxgL9wnl0OsusYrM",
+        authDomain: "hawkergo-27643.firebaseapp.com",
+        databaseURL: "https://hawkergo-27643-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "hawkergo-27643"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const mainCanvas = document.getElementById('thermalCanvas');
+    const mainCtx = mainCanvas.getContext('2d');
+
+    // Create a tiny off-screen canvas to hold raw 32x24 data
+    const rawCanvas = document.createElement('canvas');
+    rawCanvas.width = 32;
+    rawCanvas.height = 24;
+    const rawCtx = rawCanvas.getContext('2d', { alpha: false });
+
+    const HUMAN_MIN = 32.0;
+    const HUMAN_MAX = 37.0; 
+    const MIN_BLOB_SIZE = 12;
+
+    // 2. Inferno Color Mapping
+    function getInfernoColor(temp) {
+        if (temp < HUMAN_MIN) return 'rgb(0,0,0)';
+        let norm = (temp - HUMAN_MIN) / (HUMAN_MAX - HUMAN_MIN);
+        norm = Math.max(0, Math.min(1, norm));
+        
+        // Math for smooth thermal gradients
+        const r = Math.floor(Math.pow(norm, 0.5) * 255);
+        const g = Math.floor(Math.pow(norm, 1.5) * 255);
+        const b = Math.floor(Math.pow(norm, 3.5) * 200);
+        return `rgb(${r},${g},${b})`;
+    }
+
+    // 3. Blob Counting (for the data logic)
+    function countPeople(data) {
+        if (!data || data.length < 768) return 0;
+        let visited = new Uint8Array(768);
+        let count = 0;
+
+        for (let i = 0; i < 768; i++) {
+            if (data[i] >= HUMAN_MIN && !visited[i]) {
+                let blobSize = 0;
+                let stack = [i];
+                visited[i] = 1;
+
+                while (stack.length > 0) {
+                    let curr = stack.pop();
+                    blobSize++;
+                    let r = Math.floor(curr / 32);
+                    let c = curr % 32;
+                    const neighbors = [[r-1, c], [r+1, c], [r, c-1], [r, c+1]];
+                    for (let [nr, nc] of neighbors) {
+                        let nIdx = nr * 32 + nc;
+                        if (nr >= 0 && nr < 24 && nc >= 0 && nc < 32 && data[nIdx] >= HUMAN_MIN && !visited[nIdx]) {
+                            visited[nIdx] = 1;
+                            stack.push(nIdx);
+                        }
+                    }
+                }
+                if (blobSize >= MIN_BLOB_SIZE) count++;
+            }
+        }
+        return count;
+    }
+
+    // 4. Combined Render & Interpolation Logic
+    function updateDisplay(frameData) {
+        // Step A: Draw raw data to the tiny 32x24 canvas
+        for (let i = 0; i < 768; i++) {
+            rawCtx.fillStyle = getInfernoColor(frameData[i]);
+            rawCtx.fillRect(i % 32, Math.floor(i / 32), 1, 1);
+        }
+
+        // Step B: Upscale to main canvas using Bilinear Interpolation
+        mainCtx.imageSmoothingEnabled = true;
+        mainCtx.imageSmoothingQuality = 'high';
+        // This "stretches" the tiny image and blends the pixels together smoothly
+        mainCtx.drawImage(rawCanvas, 0, 0, 32, 24, 0, 0, mainCanvas.width, mainCanvas.height);
+
+        // Step C: Update Text UI
+        const count = countPeople(frameData);
+        document.getElementById('peopleCount').innerText = count;
+    }
+
+    // 5. Firebase Real-time Hook
+    const thermalQuery = query(ref(db, "thermal_logs"), limitToLast(1));
+
+    onValue(thermalQuery, (snapshot) => {
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const entry = childSnapshot.val();
+                if (entry.values) {
+                    const frameData = entry.values.split(',').map(Number);
+                    updateDisplay(frameData);
+                }
+            });
+        }
+    }, (error) => console.error("Firebase Connection Error:", error));
+
+</script>
+</body>
+</html>

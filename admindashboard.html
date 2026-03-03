@@ -10,7 +10,7 @@
         :root {
             --primary-orange: #ff4500;
         }
-        body { background-color: #f9f9f9; }
+        body { background-color: #f9f9f9; font-family: 'Poppins', sans-serif; }
         
         .admin-thermal-container {
             background: #121212;
@@ -23,7 +23,6 @@
             text-align: center;
         }
 
-        /* Container for the canvas to maintain aspect ratio */
         .canvas-wrapper {
             position: relative;
             width: 100%;
@@ -31,13 +30,12 @@
             border-radius: 12px;
             overflow: hidden;
             border: 2px solid #333;
-            line-height: 0; /* Removes bottom spacing */
+            line-height: 0;
         }
 
         #thermalCanvas {
             width: 100%;
             height: auto;
-            /* Applying high-quality smoothing filters */
             filter: contrast(1.2) brightness(1.1);
         }
 
@@ -60,6 +58,7 @@
         .temp-info {
             font-size: 0.9rem;
             color: #aaa;
+            text-align: right;
         }
     </style>
 </head>
@@ -67,15 +66,15 @@
 <body>
 
 <nav>
-    <div class="nav-container">
-        <h1>🍜 HawkerGo Admin</h1>
+    <div class="nav-container" style="padding: 20px; text-align: center;">
+        <h1 style="font-family: 'Lobster', cursive; color: var(--primary-orange);">🍜 HawkerGo Admin</h1>
     </div>
 </nav>
 
-<section class="hero">
+<section class="hero" style="text-align: center; margin-bottom: 20px;">
     <div class="hero-box">
         <h1>High-Definition Thermal Feed</h1>
-        <p class="subtitle">Real-time queue monitoring via Bilinear Interpolation</p>
+        <p class="subtitle">Real-time queue monitoring</p>
     </div>
 </section>
 
@@ -86,12 +85,12 @@
     
     <div class="stats-overlay">
         <div style="text-align: left;">
-            <div style="color: #888; text-size-adjust: 0.8rem; text-transform: uppercase;">Live Count</div>
+            <div style="color: #888; font-size: 0.8rem; text-transform: uppercase;">Live Count</div>
             <div class="count-badge"><span id="peopleCount">0</span> People</div>
         </div>
         <div class="temp-info">
             Range: 32°C - 37°C<br>
-            Mode: High Interpolation
+            Mode: High Interpolation (Rotated)
         </div>
     </div>
 </div>
@@ -113,13 +112,13 @@
     const mainCanvas = document.getElementById('thermalCanvas');
     const mainCtx = mainCanvas.getContext('2d');
 
-    // Create a tiny off-screen canvas to hold raw 32x24 data
+    // Tiny off-screen canvas for raw 32x24 data
     const rawCanvas = document.createElement('canvas');
     rawCanvas.width = 32;
     rawCanvas.height = 24;
     const rawCtx = rawCanvas.getContext('2d', { alpha: false });
 
-    const HUMAN_MIN = 32.0;
+    const HUMAN_MIN = 31.0;
     const HUMAN_MAX = 37.0; 
     const MIN_BLOB_SIZE = 12;
 
@@ -129,14 +128,13 @@
         let norm = (temp - HUMAN_MIN) / (HUMAN_MAX - HUMAN_MIN);
         norm = Math.max(0, Math.min(1, norm));
         
-        // Math for smooth thermal gradients
         const r = Math.floor(Math.pow(norm, 0.5) * 255);
         const g = Math.floor(Math.pow(norm, 1.5) * 255);
         const b = Math.floor(Math.pow(norm, 3.5) * 200);
         return `rgb(${r},${g},${b})`;
     }
 
-    // 3. Blob Counting (for the data logic)
+    // 3. Blob Counting Logic (Raw Data Analysis)
     function countPeople(data) {
         if (!data || data.length < 768) return 0;
         let visited = new Uint8Array(768);
@@ -168,7 +166,7 @@
         return count;
     }
 
-    // 4. Combined Render & Interpolation Logic
+    // 4. Render Logic with 180-degree Rotation
     function updateDisplay(frameData) {
         // Step A: Draw raw data to the tiny 32x24 canvas
         for (let i = 0; i < 768; i++) {
@@ -176,11 +174,23 @@
             rawCtx.fillRect(i % 32, Math.floor(i / 32), 1, 1);
         }
 
-        // Step B: Upscale to main canvas using Bilinear Interpolation
+        // Step B: Upscale to main canvas with 180-degree rotation
+        mainCtx.save(); // Save current context state
+        
+        // Move rotation point to center of canvas
+        mainCtx.translate(mainCanvas.width / 2, mainCanvas.height / 2);
+        // Rotate 180 degrees (PI radians)
+        mainCtx.rotate(Math.PI);
+        // Move back
+        mainCtx.translate(-mainCanvas.width / 2, -mainCanvas.height / 2);
+
         mainCtx.imageSmoothingEnabled = true;
         mainCtx.imageSmoothingQuality = 'high';
-        // This "stretches" the tiny image and blends the pixels together smoothly
+        
+        // Draw the raw image (now rotated)
         mainCtx.drawImage(rawCanvas, 0, 0, 32, 24, 0, 0, mainCanvas.width, mainCanvas.height);
+        
+        mainCtx.restore(); // Restore context for any future non-rotated drawing
 
         // Step C: Update Text UI
         const count = countPeople(frameData);

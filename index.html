@@ -230,66 +230,134 @@
 </a>
 
 </div>
-</section>
-<section class="bottom-quiz">
-    <h2>Not sure what to get now?/Still can't decide?</h2>
-    <p>Use our Decision Quiz to find the best stall for you.</p>
-
-    <a href="quiz.html" class="bottom-quiz-btn">
-        🍽️ Click Here to Take the Decision Quiz
-    </a>
-</section>
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    const firebaseConfig = {
+  // 1. Firebase Configuration
+  const firebaseConfig = {
     apiKey: "AIzaSyDcWcKPklNBt4Iqm4bwxgL9wnl0OsusYrM",
     authDomain: "hawkergo-27643.firebaseapp.com",
     databaseURL: "https://hawkergo-27643-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "hawkergo-27643"
-    };
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-    // 🔥 reference to all stalls
-    const stallsRef = ref(database, "stalls");
+  // 2. Constants for People Counting
+  const HUMAN_MIN = 32.0;      // Temperature threshold
+  const MIN_BLOB_SIZE = 12;   // Min pixels to be considered a person
 
-    // listen for changes to any stall queue
-    onValue(stallsRef, (snapshot) => {
-    const data = snapshot.val();
+  // 3. The Algorithm: Flood Fill to count distinct "Heat Blobs"
+  function countPeople(data) {
+    if (!data || data.length < 768) return 0;
+    
+    let visited = new Uint8Array(768);
+    let count = 0;
 
-    let totalQueue = 0;
+    for (let i = 0; i < 768; i++) {
+      if (data[i] >= HUMAN_MIN && !visited[i]) {
+        let blobSize = 0;
+        let stack = [i];
+        visited[i] = 1;
 
-    for (const stallName in data) {
-        const queueNumber = data[stallName].queue;
-        totalQueue += queueNumber; // optional, to show total in #queueCount
-        updateStall(stallName, queueNumber);
+        while (stack.length > 0) {
+          let curr = stack.pop();
+          blobSize++;
+          let r = Math.floor(curr / 32);
+          let c = curr % 32;
+
+          // Check 4-way neighbors
+          const neighbors = [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]];
+          for (let [nr, nc] of neighbors) {
+            let nIdx = nr * 32 + nc;
+            if (nr >= 0 && nr < 24 && nc >= 0 && nc < 32 && data[nIdx] >= HUMAN_MIN && !visited[nIdx]) {
+              visited[nIdx] = 1;
+              stack.push(nIdx);
+            }
+          }
+        }
+        // If the hot blob is big enough, it's a person
+        if (blobSize >= MIN_BLOB_SIZE) count++;
+      }
     }
+    return count;
+  }
 
-    // update top display for total people in queue
-    document.getElementById("queueCount").innerText = totalQueue;
-    });
+  // 4. Firebase Listener (Targeting your ESP32 Data)
+  // IMPORTANT: Ensure "thermal_logs" matches the folder name in your Firebase Console
+  const thermalQuery = query(ref(db, "thermal_logs"), limitToLast(1));
 
-    // function to update a stall badge & color
-    function updateStall(stallName, queueNumber) {
-    const stall = document.querySelector(`.stall.${stallName}`);
-    if (!stall) return;
+  onValue(thermalQuery, (snapshot) => {
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const entry = childSnapshot.val();
+        
+        // entry.values is the CSV string from the ESP32
+        if (entry.values) {
+          // A. Convert CSV string back to Number Array
+          const frameData = entry.values.split(',').map(Number);
+          
+          // B. Run the counting algorithm
+          const peopleCount = countPeople(frameData);
+          
+          // C. Update the UI
+          updateThermalUI(peopleCount);
+        }
+      });
+    }
+  }, (error) => {
+    console.error("Firebase Error:", error);
+  });
 
-    const badge = stall.querySelector(".wait-badge");
-    badge.innerText = queueNumber;
-
-    stall.classList.remove("short", "medium", "long");
-
-    if (queueNumber <= 3) {
-        stall.classList.add("short");
-    } else if (queueNumber <= 8) {
-        stall.classList.add("medium");
+  function updateThermalUI(count) {
+    const waitTime = count * 3; // 3 mins per person
+    
+    // 1. Determine the color class based on your specific rules
+    let colorClass = "";
+    if (count === 0) {
+        colorClass = "short";  // Green
+    } else if (count === 1) {
+        colorClass = "medium"; // Orange
     } else {
-        stall.classList.add("long");
+        colorClass = "long";   // Red
     }
+
+    // 2. Update the Map Stall (The interactive dot)
+    const westernStall = document.querySelector('.stall.western');
+    const westernBadge = document.querySelector('.stall.western .wait-badge');
+    const westernBtn = document.querySelector('.stall.western .wait-btn');
+
+    if (westernStall) {
+        // Removes short/medium/long and adds the new one
+        westernStall.classList.remove('short', 'medium', 'long');
+        westernStall.classList.add(colorClass);
     }
+    if (westernBadge) westernBadge.innerText = waitTime;
+    if (westernBtn) {
+        westernBtn.innerText = waitTime + " mins";
+        westernBtn.classList.remove('short', 'medium', 'long');
+        westernBtn.classList.add(colorClass);
+    }
+
+    // 3. Update the Card (The list at the bottom)
+    const westernCard = document.querySelector('.card.western');
+    const westernDonut = document.querySelector('.card.western .donut');
+
+    if (westernDonut) {
+        westernDonut.innerText = waitTime + "m";
+        westernDonut.classList.remove('short', 'medium', 'long');
+        westernDonut.classList.add(colorClass);
+        
+        // Adjust the visual fill of the donut
+        // 0 people = 10%, 1 person = 50%, 2+ people = 100%
+        let percent = count === 0 ? 10 : (count === 1 ? 50 : 100);
+        westernDonut.style.setProperty('--percent', percent);
+    }
+
+    console.log(`Update: ${count} people detected. Status: ${colorClass}`);
+}
 </script>
 </body>
 </html>

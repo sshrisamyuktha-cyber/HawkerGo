@@ -310,8 +310,10 @@
         westernDonut.classList.add(colorClass);
         
         // Adjust the visual fill of the donut
-        // 0 people = 10%, 1 person = 50%, 2+ people = 100%
-        let percent = count === 0 ? 10 : (count === 1 ? 50 : 100);
+        // 0 people = 15%, 1 person = 30%, 2+ people = 100%
+        //let percent = count === 0 ? 15 : (count === 1 ? 30 : 100);
+        
+        let percent = count === 0 ? 10 : count * 15;
         westernDonut.style.setProperty('--percent', percent);
     }
 
@@ -320,6 +322,5 @@
 </script>
 </body>
 </html>
-
 
 
